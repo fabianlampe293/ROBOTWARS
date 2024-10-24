@@ -48,10 +48,8 @@ print("Herzlich Willkommen: ", robo_Name1, robo_Name2)
 
 print("Möchtest du das Spiel starten?")
 Antwort = input("Ja oder Nein: ")
-if Antwort.lower() == "ja":
+while Antwort.lower() == "ja":
     print("Das Spiel beginnt:")
-else:
-    print(a, b)
 
 #from Grafiken import ArtDisplay
 
@@ -62,6 +60,7 @@ class Robot:
         self.y = y
         self.hp = 3
         self.potions = 2
+        self.shield=1
 
     def move(self, direction):
         if direction == 'up' and self.y > 0:
@@ -84,6 +83,9 @@ class Robot:
         if self.potions > 0:
             self.hp += 1
             self.potions -= 1
+
+    def shielding(self):
+
 
 def draw_field(robots, width=15, height=10):
     field = [['.' for _ in range(width)] for _ in range(height)]
