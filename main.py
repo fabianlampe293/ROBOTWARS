@@ -39,17 +39,22 @@ b ="""
     //________\\ /________\\
 
 """
-print(a)
-print(b)
+while True:
+    print(a)
+    print(b)
 
-robo_Name1 = input("Gib deinen Robotornamen ein: ")
-robo_Name2 = input("Gib deinen Robotornamen ein: ")
-print("Herzlich Willkommen: ", robo_Name1, robo_Name2)
+    robo_Name1 = input("Gib deinen Robotornamen ein: ")
+    robo_Name2 = input("Gib deinen Robotornamen ein: ")
+    print("Herzlich Willkommen: ", robo_Name1, robo_Name2)
 
-print("Möchtest du das Spiel starten?")
-Antwort = input("Ja oder Nein: ")
-while Antwort.lower() == "ja":
-    print("Das Spiel beginnt:")
+    print("Möchtest du das Spiel starten?")
+    antwort = input("Ja oder Nein: ").lower()
+    if antwort == "ja":
+        print("Das Spiel beginnt:")
+        break
+    else:
+        print("Starte die Eingabe erneut.")
+
 
 #from Grafiken import ArtDisplay
 
@@ -60,7 +65,9 @@ class Robot:
         self.y = y
         self.hp = 3
         self.potions = 2
-        self.shield=1
+        self.shield = 1
+        self.attack_power = 1
+        self.shield_active = False
 
     def move(self, direction):
         if direction == 'up' and self.y > 0:
@@ -75,7 +82,11 @@ class Robot:
     def attack(self, other_robot):
         if (self.x == other_robot.x and abs(self.y - other_robot.y) == 1) or \
            (self.y == other_robot.y and abs(self.x - other_robot.x) == 1):
-            other_robot.hp -= 1
+            if other_robot.shield_active:
+                print(f"{other_robot.name} hat den Angriff mit dem Schild blockiert!")
+                other_robot.shield_active = False  # Deactivate the shield after blocking an attack
+            else:
+                other_robot.hp -= self.attack_power
             return True
         return False
 
@@ -85,16 +96,19 @@ class Robot:
             self.potions -= 1
 
     def shielding(self):
-
+        if self.shield > 0 and not self.shield_active:
+            self.shield_active = True
+            self.shield -= 1
+            print(f"{self.name} hat das Schild aktiviert!")
 
 def draw_field(robots, width=15, height=10):
-    field = [['.' for _ in range(width)] for _ in range(height)]
+    field = [['[ ]' for _ in range(width)] for _ in range(height)]
 
     for robot in robots:
-        field[robot.y][robot.x] = robot.name[0]
+        field[robot.y][robot.x] = f'[{robot.name[0]}]'
 
     for row in field:
-        print(' '.join(row))
+        print(''.join(row))
 
 robot1 = Robot(robo_Name1, 0, 0)
 robot2 = Robot(robo_Name2, 1, 0)
@@ -103,7 +117,7 @@ def control_robots(robot1, robot2):
     while robot1.hp > 0 and robot2.hp > 0:
         draw_field([robot1, robot2])
 
-        move1 = input(f"{robot1.name}, gib eine Richtung ein (up, down, left, right) oder 'attack' oder 'heal': ")
+        move1 = input(f"{robot1.name}, gib eine Richtung ein (up, down, left, right) oder 'attack', 'heal', 'shield': ")
         if move1 in ['up', 'down', 'left', 'right']:
             robot1.move(move1)
         elif move1 == 'attack':
@@ -111,35 +125,18 @@ def control_robots(robot1, robot2):
                 print(f"{robot1.name} hat {robot2.name} getroffen!")
             else:
                 print(f"{robot1.name} hat daneben geschossen!")
-        if move1 == 'heal':
+        elif move1 == 'shield':
+            robot1.shielding()
+        elif move1 == 'heal':
             if robot1.potions > 0:
                 if robot1.hp < 3:
                     robot1.healing()
                     print(f"{robot1.name} hat sich geheilt!")
                 else:
-                     print(f"{robot1.name} hat zu viel Leben.")
+                    print(f"{robot1.name} hat zu viel Leben.")
             else:
-                if robot1.potions == 0:
-                    print("Du hast keine Tränke mehr")
-                    move1 = input(
-                        f"{robot1.name}, gib eine Richtung ein (up, down, left, right) oder 'attack' oder 'heal': ")
-                    if move1 in ['up', 'down', 'left', 'right']:
-                        robot1.move(move1)
-                    elif move1 == 'attack':
-                        if robot1.attack(robot2):
-                            print(f"{robot1.name} hat {robot2.name} getroffen!")
-                        else:
-                            print(f"{robot1.name} hat daneben geschossen!")
-                    if move1 == 'heal':
-                        if robot1.potions > 0:
-                            if robot1.hp < 3:
-                                robot1.healing()
-                                print(f"{robot1.name} hat sich geheilt!")
-                            else:
-                                print(f"{robot1.name} hat zu viel Leben.")
-                        else:
-                            if robot1.potions == 0:
-                                print("Du hast keine Tränke mehr")
+                print("Du hast keine Tränke mehr")
+
 
         move2 = input(f"{robot2.name}, gib eine Richtung ein (up, down, left, right) oder 'attack' oder 'heal': ")
         if move2 in ['up', 'down', 'left', 'right']:
@@ -149,6 +146,10 @@ def control_robots(robot1, robot2):
                 print(f"{robot2.name} hat {robot1.name} getroffen!")
             else:
                 print(f"{robot2.name} hat daneben geschossen!")
+        elif move2 == 'shield':
+            robot2.shielding()
+        elif move2 == 'shield':
+            robot2.shielding()
         if move2 == 'heal':
             if robot2.potions >0:
                 if robot2.hp < 3:
