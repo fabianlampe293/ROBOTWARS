@@ -76,21 +76,24 @@ def create_robot(name):
     x, y = spawn_point()
     return Robot(name, x, y, movement_rate, attack_damage, attack_range, health)
 
-
+"""def count_rounds(count):
+    count=0
+    if control_robots():
+        count+=1
+"""
 def apply_item_effect(robot, item):
-    """Wende die Effekte eines Items an."""
-    print(f"{robot.name} hat ein Item aufgesammelt!")
-    robot.attack_damage += 1
-    robot.energy += 2
-    if robot.hp < robot.max_hp:  # Heilt nur, wenn HP unter dem Maximum sind
-        robot.hp += 1
-        print(f"{robot.name} wurde um 1 HP geheilt!")
-    print(f"{robot.name}: AttackDamage: {robot.attack_damage}, Energie: {robot.energy}, HP: {robot.hp}")
+        print(f"{robot.name} hat ein Item aufgesammelt!")
+        robot.attack_damage += 1
+        robot.energy += 2
+        if robot.hp < robot.max_hp:
+            robot.hp += 1
+            print(f"{robot.name} wurde um 1 HP geheilt!")
+        print(f"{robot.name}: AttackDamage: {robot.attack_damage}, Energie: {robot.energy}, HP: {robot.hp}")
 
 
 def control_robots(robot1, robot2):
-    items = [(5, 5), (10, 3)]  # Feste Item-Positionen
-    obstacles = [(7, 5), (8, 5)]  # Feste Hindernisse
+    items = [(5, 5), (10, 3)]
+    obstacles = [(7, 5), (8, 5)]
 
     while robot1.hp > 0 and robot2.hp > 0:
         robots = sorted([robot1, robot2], key=lambda r: r.movement_rate, reverse=True)
@@ -114,7 +117,7 @@ def control_robots(robot1, robot2):
 
                             # Prüfen, ob das Feld ein Item enthält
                             if (target_x, target_y) in items:
-                                items.remove((target_x, target_y))  # Entferne Item von der Map
+                                items.remove((target_x, target_y))
                                 apply_item_effect(robot, (target_x, target_y))
                         else:
                             print("Ziel außerhalb des Spielfelds.")
@@ -131,13 +134,14 @@ def control_robots(robot1, robot2):
 
         if robot1.hp <= 0:
             print(f"{robot2.name} hat gewonnen!")
+            ascii_art.display_art_c()
             break
         elif robot2.hp <= 0:
             print(f"{robot1.name} hat gewonnen!")
+            ascii_art.display_art_c()
             break
 
 
-# Hauptprogramm
 print("Roboter erstellen:")
 robo1 = create_robot(roboname1)
 robo2 = create_robot(roboname2)
