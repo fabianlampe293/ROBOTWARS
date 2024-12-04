@@ -76,11 +76,7 @@ def create_robot(name):
     x, y = spawn_point()
     return Robot(name, x, y, movement_rate, attack_damage, attack_range, health)
 
-"""def count_rounds(count):
-    count=0
-    if control_robots():
-        count+=1
-"""
+
 def apply_item_effect(robot, item):
         print(f"{robot.name} hat ein Item aufgesammelt!")
         robot.attack_damage += 1
@@ -90,48 +86,51 @@ def apply_item_effect(robot, item):
             print(f"{robot.name} wurde um 1 HP geheilt!")
         print(f"{robot.name}: AttackDamage: {robot.attack_damage}, Energie: {robot.energy}, HP: {robot.hp}")
 
-
 def control_robots(robot1, robot2):
     items = [(5, 5), (10, 3)]
     obstacles = [(7, 5), (8, 5)]
 
+    robots = [robot1, robot2]
+    current_turn = 0
+
     while robot1.hp > 0 and robot2.hp > 0:
-        robots = sorted([robot1, robot2], key=lambda r: r.movement_rate, reverse=True)
+        current_robot = robots[current_turn]
+        other_robot = robots[1 - current_turn]
 
-        for robot in robots:
-            if robot.hp <= 0:
-                continue
+        if current_robot.hp <= 0:
+            current_turn = 1 - current_turn
+            continue
 
-            robot.reset_energy()
-            draw_field(robots, items, obstacles)
+        current_robot.reset_energy()
+        draw_field(robots, items, obstacles)
 
-            while robot.energy > 0:
-                print(f"{robot.name}: Energie: {robot.energy}, HP: {robot.hp}")
-                action = input(f"{robot.name}, wähle Aktion (move, attack): ").lower()
+        print(f"{current_robot.name} ist am Zug!")
+        print(f"{current_robot.name}: Energie: {current_robot.energy}, HP: {current_robot.hp}")
+        action = input(f"{current_robot.name}, wähle Aktion (move, attack): ").lower()
 
-                if action == "move":
-                    try:
-                        target_x, target_y = map(int, input("Zielkoordinaten (x y): ").split())
-                        if 0 <= target_x < 15 and 0 <= target_y < 10:
-                            robot.move(target_x, target_y, obstacles)
+        if action == "move":
+            try:
+                target_x, target_y = map(int, input("Zielkoordinaten (x y): ").split())
+                if 0 <= target_x < 15 and 0 <= target_y < 10:
+                    current_robot.move(target_x, target_y, obstacles)
 
-                            # Prüfen, ob das Feld ein Item enthält
-                            if (target_x, target_y) in items:
-                                items.remove((target_x, target_y))
-                                apply_item_effect(robot, (target_x, target_y))
-                        else:
-                            print("Ziel außerhalb des Spielfelds.")
-                    except ValueError:
-                        print("Ungültige Eingabe. Gib Koordinaten als 'x y' ein.")
-                elif action == "attack":
-                    target = robot2 if robot == robot1 else robot1
-                    robot.attack(target, obstacles)
+                    # Prüfen, ob das Feld ein Item enthält
+                    if (target_x, target_y) in items:
+                        items.remove((target_x, target_y))
+                        apply_item_effect(current_robot, (target_x, target_y))
                 else:
-                    print("Ungültige Aktion.")
+                    print("Ziel außerhalb des Spielfelds.")
+            except ValueError:
+                print("Ungültige Eingabe. Gib Koordinaten als 'x y' ein.")
+        elif action == "attack":
+            current_robot.attack(other_robot, obstacles)
+        else:
+            print("Ungültige Aktion.")
 
-                if robot.energy <= 0:
-                    print(f"{robot.name} hat keine Energie mehr für diesen Zug.")
+        if current_robot.energy <= 0:
+            print(f"{current_robot.name} hat keine Energie mehr für diesen Zug.")
 
+        # Überprüfen, ob einer der Roboter besiegt wurde
         if robot1.hp <= 0:
             print(f"{robot2.name} hat gewonnen!")
             ascii_art.display_art_c()
@@ -141,8 +140,10 @@ def control_robots(robot1, robot2):
             ascii_art.display_art_c()
             break
 
+        # Wechsel zum nächsten Roboter
+        current_turn = 1 - current_turn
 
-print("Roboter erstellen:")
+
 robo1 = create_robot(roboname1)
 robo2 = create_robot(roboname2)
 control_robots(robo1, robo2)
