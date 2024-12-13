@@ -9,7 +9,6 @@ class Robot:
         self.hp = hp
         self.max_hp = hp
         self.energy = movement_rate
-
     def reset_energy(self):
         self.energy = self.movement_rate
 

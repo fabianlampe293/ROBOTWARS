@@ -1,12 +1,14 @@
 from Grafiken import AsciiArt
 
 ascii_art = AsciiArt()
+ascii_art.display_art_a()
+ascii_art.display_art_b()
+roboname1 = input("Gib deinen Robotornamen ein: ")
+roboname2 = input("Gib deinen Robotornamen ein: ")
 
 
 def start_game():
     while True:
-        ascii_art.display_art_a()
-        ascii_art.display_art_b()
         print("Möchtest du das Spiel starten?")
         antwort = input("Ja oder Nein: ").lower()
         if antwort == "ja":
@@ -19,28 +21,26 @@ def start_game():
             print("Ungültige Eingabe. Starte die Eingabe erneut.")
 
 
-roboname1 = input("Gib deinen Robotornamen ein: ")
-roboname2 = input("Gib deinen Robotornamen ein: ")
 start_game()
 import random
 from Roboter import Robot
 
 
 def draw_field(robots, items, obstacles, width=15, height=10):
-    print("   " + " ".join(f"{x:2}" for x in range(width)))  # X-Koordinaten
+    print("   " + " ".join(f"{x:2}" for x in range(width)))
     field = [['[ ]' for _ in range(width)] for _ in range(height)]
 
     for robot in robots:
         field[robot.y][robot.x] = f'[{robot.name[0]}]'
 
     for item in items:
-        field[item[1]][item[0]] = '[I]'  # Items mit "I" darstellen
+        field[item[1]][item[0]] = '[I]'
 
     for obstacle in obstacles:
-        field[obstacle[1]][obstacle[0]] = '[X]'  # Hindernisse mit "X" darstellen
+        field[obstacle[1]][obstacle[0]] = '[X]'
 
     for y, row in enumerate(field):
-        print(f"{y:2} " + ''.join(row))  # Y-Koordinaten
+        print(f"{y:2} " + ''.join(row))
 
 
 def spawn_point(width=15, height=10):
@@ -86,9 +86,19 @@ def apply_item_effect(robot, item):
             print(f"{robot.name} wurde um 1 HP geheilt!")
         print(f"{robot.name}: AttackDamage: {robot.attack_damage}, Energie: {robot.energy}, HP: {robot.hp}")
 
+def generate_obstacles():
+    number_of_obstacles = 15
+    felder = [(x, y) for x in range(15) for y in range(10)]
+    return random.sample(felder, number_of_obstacles)
+
+def generate_items():
+    number_of_items = 4
+    felder = [(x, y) for x in range(15) for y in range(10)]
+    return random.sample(felder, number_of_items)
+
 def control_robots(robot1, robot2):
-    items = [(5, 5), (10, 3)]
-    obstacles = [(7, 5), (8, 5)]
+    obstacles = generate_obstacles()
+    items = generate_items()
 
     robots = [robot1, robot2]
     current_turn = 0
@@ -114,7 +124,6 @@ def control_robots(robot1, robot2):
                 if 0 <= target_x < 15 and 0 <= target_y < 10:
                     current_robot.move(target_x, target_y, obstacles)
 
-                    # Prüfen, ob das Feld ein Item enthält
                     if (target_x, target_y) in items:
                         items.remove((target_x, target_y))
                         apply_item_effect(current_robot, (target_x, target_y))
@@ -130,7 +139,6 @@ def control_robots(robot1, robot2):
         if current_robot.energy <= 0:
             print(f"{current_robot.name} hat keine Energie mehr für diesen Zug.")
 
-        # Überprüfen, ob einer der Roboter besiegt wurde
         if robot1.hp <= 0:
             print(f"{robot2.name} hat gewonnen!")
             ascii_art.display_art_c()
@@ -140,9 +148,9 @@ def control_robots(robot1, robot2):
             ascii_art.display_art_c()
             break
 
-        # Wechsel zum nächsten Roboter
         current_turn = 1 - current_turn
-
+items = [(x, y) for x, y in random.sample([(x, y) for x in range(15) for y in range(10)], 4)]
+obstacals = [(x, y) for x, y in random.sample([(x, y) for x in range(15) for y in range(10)], 8)]
 
 robo1 = create_robot(roboname1)
 robo2 = create_robot(roboname2)
